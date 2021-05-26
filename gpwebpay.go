@@ -14,9 +14,12 @@ func NewClient(config Config, httpClient *http.Client) (*GPWebpayClient, error) 
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	if config == nil {
-		config = InitConfigFromEnv()
-	}
+
+	// TODO: Fix checking if config has not been initialised yet.
+	//       Right now it results in: "invalid operation: config == nil (mismatched types Config and nil)"
+	// if config == nil {
+	// 	config = InitConfigFromEnv()
+	// }
 
 	configErr := config.validate()
 	if configErr != nil {
