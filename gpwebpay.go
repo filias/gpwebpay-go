@@ -2,7 +2,7 @@ package gpwebpay
 
 import (
 	"errors"
-	"http"
+	"net/http"
 )
 
 type GPWebpayClient struct {
