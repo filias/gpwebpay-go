@@ -1,7 +1,6 @@
 package gpwebpay
 
 import (
-	//"errors"
 	"net/http"
 )
 
@@ -39,11 +38,6 @@ func (client *GPWebpayClient) RequestPayment() (*http.Response, error) {
 	return resp, nil
 }                               
 
-// headers = {
-// 	"accept-charset": "UTF-8",
-// 	"accept-encoding": "UTF-8",
-// 	"Content-Type": "application/x-www-form-urlencoded",
-// }
 
 // This is a first shot at having some methods.
 // TODO: fix declarations and return types.
