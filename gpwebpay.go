@@ -1,7 +1,7 @@
 package gpwebpay
 
 import (
-	"errors"
+	//"errors"
 	"net/http"
 )
 
@@ -15,25 +15,35 @@ func NewClient(config Config, httpClient *http.Client) (*GPWebpayClient, error) 
 		httpClient = http.DefaultClient
 	}
 
-	// TODO: Fix checking if config has not been initialised yet.
-	//       Right now it results in: "invalid operation: config == nil (mismatched types Config and nil)"
-	// if config == nil {
-	// 	config = InitConfigFromEnv()
-	// }
+	// Init the config
+	config.InitConfigFromEnv()
 
-	configErr := config.validate()
-	if configErr != nil {
-		errMsg := "Config is invalid."
-		// TODO add configErr to errMsg.
-		return nil, errors.New(errMsg)
-	}
-
+	// Create the client
 	gpWebpayClient := &GPWebpayClient{
 		config:     config,
 		httpClient: httpClient,
 	}
+
 	return gpWebpayClient, nil
 }
+
+
+func (client *GPWebpayClient) RequestPayment() (*http.Response, error) {
+	// This makes an http request to gpwebpay
+	resp, err := http.Post(client.config.GPWebpayUrl, "application/x-www-form-urlencoded", nil)
+
+	if err != nil {
+		// handle error
+	}
+
+	return resp, nil
+}                               
+
+// headers = {
+// 	"accept-charset": "UTF-8",
+// 	"accept-encoding": "UTF-8",
+// 	"Content-Type": "application/x-www-form-urlencoded",
+// }
 
 // This is a first shot at having some methods.
 // TODO: fix declarations and return types.
@@ -42,5 +52,4 @@ func (c *GPWebpayClient) createMessage(data interface{}, isDigest1 bool)   {}
 func (c *GPWebpayClient) signMessage(message []byte, key []byte)           {}
 func (c *GPWebpayClient) createCallbackData(url string)                    {}
 func (c *GPWebpayClient) isCallbackValid()                                 {}
-func (c *GPWebpayClient) RequestPayment()                                  {}
 func (c *GPWebpayClient) GetPaymentResult(url string, key []byte)          {}

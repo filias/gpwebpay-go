@@ -23,8 +23,8 @@ func getEnv(key string, fallback string) string {
 	return value
 }
 
-func InitConfigFromEnv() Config {
-	config := Config{}
+func (config *Config) InitConfigFromEnv() {
+	//config := Config{}
 
 	config.Currency = getEnv("GPWEBPAY_CURRENCY", "978") // EUR
 	config.DepositFlag = getEnv("GPWEBPAY_DEPOSIT_FLAG", "1")
@@ -35,7 +35,7 @@ func InitConfigFromEnv() Config {
 	config.GPWebpayPublicKey = getEnv("GPWEBPAY_PUBLIC_KEY", "")
 	config.GPWebpayUrl = getEnv("GPWEBPAY_URL", "https://test.3dsecure.gpwebpay.com/pgw/order.do") // Default to test env
 
-	return config
+	//return config
 }
 
 func (c *Config) validate() error {
