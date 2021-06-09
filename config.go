@@ -1,6 +1,7 @@
 package gpwebpay
 
 import (
+	"errors"
 	"os"
 )
 
@@ -39,6 +40,29 @@ func InitConfigFromEnv() Config {
 }
 
 func (c *Config) validate() error {
-	// TODO: Function to validate if the config has all necessary values
+	if c.Currency == "" {
+		return errors.New("Currency is required.")
+	}
+	if c.DepositFlag == "" {
+		return errors.New("DepositFlag is required.")
+	}
+	if c.MerchantCallbackUrl == "" {
+		return errors.New("MerchantCallbackUrl is required.")
+	}
+	if c.MerchantId == "" {
+		return errors.New("MerchantId is required.")
+	}
+	if c.MerchantPrivateKey == "" {
+		return errors.New("MerchantPrivateKey is required.")
+	}
+	if c.MerchantPrivateKeyPassphrase == "" {
+		return errors.New("MerchantPrivateKeyPassphrase is required.")
+	}
+	if c.GPWebpayPublicKey == "" {
+		return errors.New("GPWebpayPublicKey is required.")
+	}
+	if c.GPWebpayUrl == "" {
+		return errors.New("GPWebpayUrl is required.")
+	}
 	return nil
 }
