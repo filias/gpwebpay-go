@@ -1,9 +1,13 @@
 package gpwebpay
 
 import (
-	"crypto/hmac"
+	"crypto"
+	"crypto/rsa"
 	"crypto/sha1"
+	"crypto/x509"
 	"encoding/base64"
+	"encoding/pem"
+	"fmt"
 	"net/http"
 )
 
@@ -42,11 +46,26 @@ func (client *GPWebpayClient) RequestPayment() (*http.Response, error) {
 
 func (c *GPWebpayClient) signMessage(message string) (string, error) {
 	// This signs the message with the key
-	hasher := hmac.New(sha1.New, []byte(c.config.MerchantPrivateKey))
-	hasher.Write([]byte(message))
-	signature := base64.StdEncoding.EncodeToString(hasher.Sum(nil))
+	keyBase64 := "secret"
+	keyPEM, _ := base64.StdEncoding.DecodeString(keyBase64)
 
-	return signature, nil
+	block, _ := pem.Decode(keyPEM)
+
+	x509.DecryptPEMBlock(block, "secret")
+	rsaPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	hashed := sha1.Sum([]byte(message))
+
+	signature, err := rsa.SignPKCS1v15(nil, rsaPrivateKey, crypto.SHA1, hashed[:])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	digest := base64.StdEncoding.EncodeToString(signature)
+	return digest, nil
 }
 
 // This is a first shot at having some methods.
