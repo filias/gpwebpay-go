@@ -2,6 +2,7 @@ package gpwebpay
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -25,12 +26,12 @@ func TestCreateCallbackData(t *testing.T) {
 
 	callback := client.createCallbackData("https://example.org/?a=1&a=2&b=3")
 	fmt.Println(callback)
-	expected = map[string]interface{
-		"a":[1,2],
-		"b":3,
+	expected := map[string]string{
+		"a": "1",
+		"b": "3",
 	}
 
-	if callback != expected {
+	if !reflect.DeepEqual(callback, expected) {
 		t.Errorf("expected %q but got %q", expected, callback)
 	}
 }

@@ -45,15 +45,21 @@ func (c *GPWebpayClient) createPaymentData(orderNumber string, amount int) {}
 func (c *GPWebpayClient) createMessage(data interface{}, isDigest1 bool)   {}
 func (c *GPWebpayClient) signMessage(message []byte, key []byte)           {}
 
-func (c *GPWebpayClient) createCallbackData(urlToParse string) map[string]interface{} {
+// def _create_callback_data(self, url: str) -> dict:
+// 		# All the data is in the querystring
+// 		parsed = urlparse.urlparse(url)
+// 		query_string = parse_qs(parsed.query)
+// 		data = {key: value[0] for key, value in query_string.items()}
+// 		return data
+func (c *GPWebpayClient) createCallbackData(urlToParse string) map[string]string {
 	parsed, err := url.Parse(urlToParse)
 	if err != nil {
 		panic(err)
 	}
 	queryString := parsed.Query()
-	m := make(map[string]interface{})
+	m := make(map[string]string)
 	for key, value := range queryString {
-		m[""+key+""] = value
+		m[key] = value[0]
 		fmt.Println("Key:", key, "Value:", value)
 	}
 	return m
