@@ -4,12 +4,13 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"crypto/sha1"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	pkcs8 "github.com/youmark/pkcs8"
 )
 
 type GPWebpayClient struct {
@@ -45,24 +46,31 @@ func (client *GPWebpayClient) RequestPayment() (*http.Response, error) {
 	return resp, nil
 }
 
+// This signs the message with the key
 func (c *GPWebpayClient) signMessage(message string) (string, error) {
-	// This signs the message with the key
-	keyBase64 := "secret"
-	keyPEM, _ := base64.StdEncoding.DecodeString(keyBase64)
+	var emptyString string
 
-	block, _ := pem.Decode(keyPEM)
-
-	x509.DecryptPEMBlock(block, "secret")
-	rsaPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	keyBase64 := c.config.MerchantPrivateKey
+	keyPEM, err := base64.StdEncoding.DecodeString(keyBase64)
 	if err != nil {
-		fmt.Println(err)
+		return emptyString, fmt.Errorf("gpwebpay: couldn't b64 decode the private key. %s", err)
+	}
+
+	block, rest := pem.Decode(keyPEM)
+	if len(rest) != 0 && block == nil {
+		return emptyString, fmt.Errorf("gpwebpay: couldn't decode PEM block. %s", string(rest))
+	}
+
+	keyPass := c.config.MerchantPrivateKeyPassphrase
+	rsaPrivateKey, err := pkcs8.ParsePKCS8PrivateKeyRSA(block.Bytes, []byte(keyPass))
+	if err != nil {
+		return emptyString, fmt.Errorf("gpwebpay: couldn't parse the private key with password. %s", err)
 	}
 
 	hashed := sha1.Sum([]byte(message))
-
 	signature, err := rsa.SignPKCS1v15(nil, rsaPrivateKey, crypto.SHA1, hashed[:])
 	if err != nil {
-		fmt.Println(err)
+		return emptyString, fmt.Errorf("gpwebpay: couldn't sign the message with a key. %s", err)
 	}
 
 	digest := base64.StdEncoding.EncodeToString(signature)
