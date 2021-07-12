@@ -41,9 +41,17 @@ func TestSignature(t *testing.T) {
 	message := "1234567890|CREATE_ORDER|123456|10|978|1|https://localhost:5000/payment_callback"
 	expectedDigest := "DWarvfXJP5CFFvn8zNEtImumad7Cmj/M5qQrbcFd66bjhFR4NxkEj4WSR4sCG/6YBWQAgJ3H/n7XPCRnTu670GaivWQ0dg7DevzyZKcCJwFs4olcA2mb4vfM0yAFW0jkqD3G3eCpHylWogxCVCXrMso8WIpc5nliwq1Sp/53Q3weXAYXIwvgOe/qtVqhdeOa+r5RNaYcgKzAWafSf9bAfweoedq1yMGfXRPTyLIQfwAhsk8DTN9ybohw4mQeZ2/LFcJklMdUuLKqJ/5MLwyV9/0jmxf2bZvymr4aj3S/wpLCJnZV5HDXqYXaVPokOwvnvGXwSMNw45h1zIwIXpQhig=="
 
+	key := os.Getenv("GPWEBPAY_MERCHANT_PRIVATE_KEY")
+	pass := os.Getenv("GPWEBPAY_MERCHANT_PRIVATE_KEY_PASSPHRASE")
+	if key == "" {
+		t.Fatalf("No private key in the environment. Set GPWEBPAY_MERCHANT_PRIVATE_KEY")
+	}
+	if pass == "" {
+		t.Fatalf("No private key passphrase in the environment. Set GPWEBPAY_MERCHANT_PRIVATE_KEY_PASSPHRASE")
+	}
 	config := Config{
-		MerchantPrivateKey:           os.Getenv("GPWEBPAY_MERCHANT_PRIVATE_KEY"),
-		MerchantPrivateKeyPassphrase: os.Getenv("GPWEBPAY_MERCHANT_PRIVATE_KEY_PASSPHRASE"),
+		MerchantPrivateKey:           key,
+		MerchantPrivateKeyPassphrase: pass,
 	}
 	client, _ := NewClient(config, nil)
 
