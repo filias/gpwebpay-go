@@ -23,3 +23,7 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+      env:
+        GPWEBPAY_MERCHANT_PRIVATE_KEY: ${{secrets.GPWEBPAY_MERCHANT_PRIVATE_KEY}}
+        GPWEBPAY_MERCHANT_PRIVATE_KEY_PASSPHRASE: ${{secrets.GPWEBPAY_MERCHANT_PRIVATE_KEY_PASSPHRASE}}
+
