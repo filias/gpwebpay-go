@@ -1,6 +1,7 @@
 package gpwebpay
 
 import (
+	"bytes"
 	"crypto"
 	"crypto/rsa"
 	"crypto/sha1"
@@ -35,13 +36,46 @@ func NewClient(config Config, httpClient *http.Client) (*GPWebpayClient, error) 
 	return gpWebpayClient, nil
 }
 
-func (client *GPWebpayClient) RequestPayment() (*http.Response, error) {
+func (client *GPWebpayClient) RequestPayment(orderNo string, amount int) (*http.Response, error) {
+	// def request_payment(
+	//     self, order_number: str = None, amount: int = 0, key: bytes = None
+	// ) -> Type[requests.Response]:
+	//     self._create_payment_data(order_number=order_number, amount=amount)
+	//     message = self._create_message(self.data)
+	//     self._sign_message(message, key=key)
+
+	//     # Send the request
+	//     # TODO: check if we need all these headers
+	//     headers = {
+	//         "accept-charset": "UTF-8",
+	//         "accept-encoding": "UTF-8",
+	//         "Content-Type": "application/x-www-form-urlencoded",
+	//     }
+	//     response = requests.post(
+	//         configuration.GPWEBPAY_URL, data=self.data, headers=headers
+	//     )
+
+	//     return response
+
 	// This makes an http request to gpwebpay
-	resp, err := http.Post(client.config.GPWebpayUrl, "application/x-www-form-urlencoded", nil)
+	url := client.config.GPWebpayUrl
+	// url := "https://httpbin.rovio.com/redirect/1"
+	// data := "url=http%3A%2F%2Fexample.com"
+
+	pdata := client.createPaymentData(orderNo, amount)
+	message := client.createMessage(pdata)
+	digest, err := client.signMessage(message)
+	if err != nil {
+		return nil, err
+	}
+	bdata := bytes.NewBuffer([]byte(digest))
+
+	resp, err := client.httpClient.Post(url, "application/x-www-form-urlencoded", bdata)
 
 	if err != nil {
-		// handle error
+		return nil, fmt.Errorf("gpwebpay: Payment request failed. %s", err)
 	}
+	// defer resp.Body.Close()
 
 	return resp, nil
 }
@@ -79,8 +113,12 @@ func (c *GPWebpayClient) signMessage(message string) (string, error) {
 
 // This is a first shot at having some methods.
 // TODO: fix declarations and return types.
-func (c *GPWebpayClient) createPaymentData(orderNumber string, amount int) {}
-func (c *GPWebpayClient) createMessage(data interface{}, isDigest1 bool)   {}
+func (c *GPWebpayClient) createPaymentData(orderNumber string, amount int) string {
+	return ""
+}
+func (c *GPWebpayClient) createMessage(data string) string {
+	return ""
+}
 
 // def _create_callback_data(self, url: str) -> dict:
 // 		# All the data is in the querystring
